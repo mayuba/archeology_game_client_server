@@ -22,7 +22,7 @@ public class Client {
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
 
-	private Grille[] board = new Grille[12];
+	private Grille[] board = new Grille[9];
 	private Grille currentGrille;
 
 	private static int PORT = 8901;
