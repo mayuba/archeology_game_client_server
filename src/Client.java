@@ -22,7 +22,7 @@ public class Client {
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
 
-	private Grille[] board = new Grille[9];
+	private Grille[] board = new Grille[16];
 	private Grille currentGrille;
 
 	private static int PORT = 8901;
@@ -71,7 +71,7 @@ public class Client {
 		frame.getContentPane().add(panel);
 
 		boardPanel.setBackground(Color.black);
-		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
+		boardPanel.setLayout(new GridLayout(4, 4, 2, 2));
 		messageLabel.setBounds(0, 398, 520, 64);
 		panel.add(messageLabel);
 		messageLabel.setBackground(Color.BLACK);

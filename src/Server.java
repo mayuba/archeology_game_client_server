@@ -7,14 +7,8 @@ public class Server {
         System.out.println("Tic Tac Toe Server is Running");
         try {
             while (true) {
-                AppGame AppGame = new AppGame(); 
-                AppGame.Connect playerX = AppGame.new Connect(listener.accept(), 'X');
-                AppGame.Connect playerO = AppGame.new Connect(listener.accept(), 'O');
-                playerX.setOpponent(playerO);
-                playerO.setOpponent(playerX);
-                AppGame.currentPlayer = playerX;
-                playerX.start();
-                playerO.start();
+                AppGame Game = new AppGame();
+                Game.runplayer(listener);
             }
         } finally {
             listener.close();

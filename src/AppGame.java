@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AppGame {
@@ -11,22 +12,38 @@ public class AppGame {
 	// current player
 	Connect currentPlayer;
 
+	public void runplayer(ServerSocket listener) {
+		
+		try {
+			Connect playerX = new Connect(listener.accept(), 'X');
+			Connect playerO = new Connect(listener.accept(), 'O');
+			playerX.setOpponent(playerO);
+			playerO.setOpponent(playerX);
+			currentPlayer = playerX;
+			playerX.start();
+			playerO.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	// winner
 	public boolean hasWinner() {
-		return (board[0] != null && board[0] == board[1] && board[0] == board[2])
-				|| (board[3] != null && board[3] == board[4] && board[3] == board[5])
-				|| (board[6] != null && board[6] == board[7] && board[6] == board[8])
-				|| (board[0] != null && board[0] == board[3] && board[0] == board[6])
-				|| (board[1] != null && board[1] == board[4] && board[1] == board[7])
-				|| (board[2] != null && board[2] == board[5] && board[2] == board[8])
-				|| (board[0] != null && board[0] == board[4] && board[0] == board[8])
-				|| (board[2] != null && board[2] == board[4] && board[2] == board[6]);
+		return (getBoard()[0] != null && getBoard()[0] == getBoard()[1] && getBoard()[0] == getBoard()[2])
+				|| (getBoard()[3] != null && getBoard()[3] == getBoard()[4] && getBoard()[3] == getBoard()[5])
+				|| (getBoard()[6] != null && getBoard()[6] == getBoard()[7] && getBoard()[6] == getBoard()[8])
+				|| (getBoard()[0] != null && getBoard()[0] == getBoard()[3] && getBoard()[0] == getBoard()[6])
+				|| (getBoard()[1] != null && getBoard()[1] == getBoard()[4] && getBoard()[1] == getBoard()[7])
+				|| (getBoard()[2] != null && getBoard()[2] == getBoard()[5] && getBoard()[2] == getBoard()[8])
+				|| (getBoard()[0] != null && getBoard()[0] == getBoard()[4] && getBoard()[0] == getBoard()[8])
+				|| (getBoard()[2] != null && getBoard()[2] == getBoard()[4] && getBoard()[2] == getBoard()[6]);
 	}
 
 	// no empty squares
 	public boolean boardFilledUp() {
-		for (int i = 0; i < board.length; i++) {
-			if (board[i] == null) {
+		for (int i = 0; i < getBoard().length; i++) {
+			if (getBoard()[i] == null) {
 				return false;
 			}
 		}
@@ -35,8 +52,8 @@ public class AppGame {
 
 	// thread when player tries a move
 	public synchronized boolean legalMove(int location, Connect player) {
-		if (player == currentPlayer && board[location] == null) {
-			board[location] = currentPlayer;
+		if (player == currentPlayer && getBoard()[location] == null) {
+			getBoard()[location] = currentPlayer;
 			currentPlayer = currentPlayer.opponent;
 			currentPlayer.otherPlayerMoved(location);
 			return true;
@@ -44,12 +61,22 @@ public class AppGame {
 		return false;
 	}
 
+	public Connect[] getBoard() {
+		return board;
+	}
+
+	public void setBoard(Connect[] board) {
+		this.board = board;
+	}
+
 	class Connect extends Thread {
+
 		char mark;
 		Connect opponent;
 		Socket socket;
 		BufferedReader input;
 		PrintWriter output;
+		// current player
 
 		// thread handler to initialize stream fields
 		public Connect(Socket socket, char mark) {
@@ -91,18 +118,18 @@ public class AppGame {
 					String command = input.readLine();
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
-						//if (legalMove(location, this)) {
-							if (this == currentPlayer && board[location] == null) {
-								board[location] = currentPlayer;
-								currentPlayer = currentPlayer.opponent;
-								currentPlayer.otherPlayerMoved(location);
+						// if (legalMove(location, this)) {
+						if (this == currentPlayer && getBoard()[location] == null) {
+							getBoard()[location] = currentPlayer;
+							currentPlayer = currentPlayer.opponent;
+							currentPlayer.otherPlayerMoved(location);
 
-								output.println("VALID_MOVE");
-								output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
-							} else {
-								output.println("MESSAGE ?");
-							}
-					//	}
+							output.println("VALID_MOVE");
+							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
+						} else {
+							output.println("MESSAGE ?");
+						}
+						// }
 					} else if (command.startsWith("QUIT")) {
 						return;
 					}
@@ -117,4 +144,5 @@ public class AppGame {
 			}
 		}
 	}
+
 }
