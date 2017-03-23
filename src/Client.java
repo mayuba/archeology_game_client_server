@@ -2,6 +2,8 @@ import javax.swing.JPanel;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
@@ -14,6 +16,14 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import java.awt.BorderLayout;
+import javax.swing.JTextPane;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.JEditorPane;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class Client {
 
@@ -22,7 +32,7 @@ public class Client {
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
 
-	private Grille[] board = new Grille[16];
+	private Grille[] board = new Grille[9];
 	private Grille currentGrille;
 
 	private static int PORT = 8901;
@@ -30,7 +40,8 @@ public class Client {
 	private BufferedReader in;
 	private PrintWriter out;
 	private final JPanel panel = new JPanel();
-
+	private JTextArea textArea;
+	private JTextField editorPane;
 	// Constructs the client by connecting to a server, laying out the GUI and
 	// registering GUI listeners.
 
@@ -47,7 +58,6 @@ public class Client {
 		// Layout GUI
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBounds(59, 11, 389, 355);
-		frame.getContentPane().setLayout(null);
 		for (int i = 0; i < board.length; i++) {
 			final int j = i;
 			board[i] = new Grille();
@@ -64,17 +74,48 @@ public class Client {
 			System.out.println(i);
 			boardPanel.add(board[i]);
 		}
+		frame.getContentPane().setLayout(null);
+		panel.setBounds(0, 0, 520, 462);
 		panel.setLayout(null);
 		panel.add(boardPanel);
-		panel.setBounds(0, 0, 520, 462);
 
 		frame.getContentPane().add(panel);
 
 		boardPanel.setBackground(Color.black);
-		boardPanel.setLayout(new GridLayout(4, 4, 2, 2));
+		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
 		messageLabel.setBounds(0, 398, 520, 64);
 		panel.add(messageLabel);
 		messageLabel.setBackground(Color.BLACK);
+
+		JPanel chat = new JPanel();
+		chat.setBounds(530, 11, 208, 451);
+		frame.getContentPane().add(chat);
+		chat.setLayout(null);
+
+		editorPane = new JTextField();
+		editorPane.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+
+					out.println("CHAT" + editorPane.getText());
+					editorPane.setText("");
+				}
+
+			}
+		});
+		editorPane.setBounds(10, 267, 192, 30);
+		chat.add(editorPane);
+
+		JButton btnEnvoyer = new JButton("Envoyer");
+		btnEnvoyer.setBounds(57, 358, 89, 23);
+		chat.add(btnEnvoyer);
+
+		textArea = new JTextArea(8, 40);
+		textArea.setEditable(false);
+		textArea.setBounds(10, 58, 192, 198);
+		chat.add(textArea);
+
 	}
 
 	// * The main thread of the client will listen for messages from the server.
@@ -101,10 +142,14 @@ public class Client {
 			}
 			while (true) {
 				response = in.readLine();
+				System.out.println(response + "bem recu");
 				if (response.startsWith("VALID_MOVE")) {
 					messageLabel.setText("Valid move, please wait");
 					currentGrille.setIcon(icon);
 					currentGrille.repaint();
+				} else if (response.startsWith("CHAT")) {
+					textArea.append(response + "\n");
+					System.out.println("MESSAGE ARRIVE");
 				} else if (response.startsWith("OPPONENT_MOVED")) {
 					int loc = Integer.parseInt(response.substring(15));
 					board[loc].setIcon(opponentIcon);
@@ -123,6 +168,7 @@ public class Client {
 					messageLabel.setText(response.substring(8));
 				}
 			}
+
 			out.println("QUIT");
 		} finally {
 			socket.close();
@@ -142,7 +188,7 @@ public class Client {
 			String serverAddress = (args.length == 0) ? "localhost" : args[1];
 			Client client = new Client(serverAddress);
 			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			client.frame.setSize(520, 504);
+			client.frame.setSize(800, 504);
 			client.frame.setVisible(true);
 			client.frame.setResizable(true);
 			Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();

@@ -11,9 +11,11 @@ public class AppGame {
 
 	// current player
 	Connect currentPlayer;
-
-	public void runplayer(ServerSocket listener) {
+	public void MESSAGE(String message) {
 		
+	}
+	public void runplayer(ServerSocket listener) {
+
 		try {
 			Connect playerX = new Connect(listener.accept(), 'X');
 			Connect playerO = new Connect(listener.accept(), 'O');
@@ -116,20 +118,31 @@ public class AppGame {
 				// Repeatedly get commands from the client and process them.
 				while (true) {
 					String command = input.readLine();
+					System.out.println(socket.getChannel());
+					System.out.println(socket.getLocalSocketAddress());
+					System.out.println(socket.getLocalAddress());
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
 						// if (legalMove(location, this)) {
 						if (this == currentPlayer && getBoard()[location] == null) {
 							getBoard()[location] = currentPlayer;
+							System.out.println(currentPlayer+" AVANT");
+							System.out.println(currentPlayer.opponent+" opponent");
 							currentPlayer = currentPlayer.opponent;
 							currentPlayer.otherPlayerMoved(location);
-
+							System.out.println(currentPlayer+" APRES");
 							output.println("VALID_MOVE");
 							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
 						} else {
 							output.println("MESSAGE ?");
 						}
 						// }
+					} else if (command.startsWith("CHAT")) {
+						System.out.println(currentPlayer+" AVANT");
+						currentPlayer = currentPlayer.opponent;
+						output.println("CHAT" + command);
+						System.out.println(currentPlayer+" APRES");
+						
 					} else if (command.startsWith("QUIT")) {
 						return;
 					}
