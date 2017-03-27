@@ -35,10 +35,10 @@ public class Client {
 	private Grille[] board = new Grille[9];
 	private Grille currentGrille;
 
-	private static int PORT = 8901;
-	private Socket socket;
-	private BufferedReader in;
-	private PrintWriter out;
+	private static int PORT= 8901,PORTCHAT=8902 ;
+	private Socket socket,socketchat;
+	private BufferedReader in,inchat;
+	private PrintWriter out,outchat;
 	private final JPanel panel = new JPanel();
 	private JTextArea textArea;
 	private JTextField editorPane;
@@ -54,7 +54,9 @@ public class Client {
 		socket = new Socket(serverAddress, PORT);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(socket.getOutputStream(), true);
-
+		socketchat = new Socket(serverAddress, PORTCHAT);
+		inchat = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		outchat = new PrintWriter(socket.getOutputStream(), true);
 		// Layout GUI
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBounds(59, 11, 389, 355);
@@ -98,7 +100,7 @@ public class Client {
 			public void keyPressed(KeyEvent arg0) {
 				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
 
-					out.println("CHAT" + editorPane.getText());
+					outchat.println("CHAT" + editorPane.getText());
 					editorPane.setText("");
 				}
 
