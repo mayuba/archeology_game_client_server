@@ -6,6 +6,10 @@ import javax.swing.JPanel;
 
 // Graphical Grille in the client window.
 	public   class Grille extends JPanel {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8690423967928771895L;
 		JLabel label = new JLabel((Icon) null);
 
 		public Grille() {
