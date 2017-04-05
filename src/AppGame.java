@@ -101,7 +101,7 @@ public class AppGame {
 				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				output = new PrintWriter(socket.getOutputStream(), true);
 				output.println("DEBUT " + mark);
-				output.println("MESSAGE Veuillez attendre un adversaire...");
+				output.println("MESSAGE Vous etes connecté...Veuillez attendre un adversaire svp....");
 			} catch (IOException e) {
 				output.println("DIED" + mark);
 				System.out.println("Votre adversaire s'est déconnecté: " + e);
