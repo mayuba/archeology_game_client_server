@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket; 
 
 import javax.swing.BorderFactory;
@@ -42,7 +43,7 @@ public class Client {
 	private final JPanel panel = new JPanel();
 	// Constructs the client by connecting to a server, laying out the GUI and
 	// registering GUI listeners.
-
+	InetAddress LocalAdress = InetAddress.getLocalHost();
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -151,7 +152,9 @@ public class Client {
 	// main
 	public static void main(String[] args) throws Exception {
 		while (true) { 
+			
 			String serverAddress = (args.length == 0) ? "localhost" : args[1];
+			
 			Client client = new Client(serverAddress);
 			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			client.frame.setSize(548, 504);
