@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.util.Random;
 
 public class AppGame {
-	// a board of 9 squares
-	private Connect[] board = { null, null, null, null, null, null, null, null, null };
+	// a board of 16 squares
+	private Connect[] board = { null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null };
 	 
 	private int tresors;
  
@@ -20,7 +20,7 @@ public class AppGame {
 	}
 	public int generateTresors(){
 		Random rnd = new Random();
-		return rnd.nextInt(8) ;
+		return rnd.nextInt(15) ;
 		
 	}
  
@@ -99,7 +99,7 @@ public class AppGame {
 				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				output = new PrintWriter(socket.getOutputStream(), true);
 				output.println("DEBUT " + mark);
-				output.println("MESSAGE Waiting for opponent to connect");
+				output.println("MESSAGE Veuillez attendre un adversaire...");
 			} catch (IOException e) {
 				System.out.println("Player died: " + e);
 			}
