@@ -17,13 +17,13 @@ import javax.swing.JOptionPane;
 
 public class Client {
 
-	private JFrame frame = new JFrame("Tic Tac Toe");
+	private JFrame frame = new JFrame("Chasse au trésor");
 	private JLabel messageLabel = new JLabel("");
 	private ImageIcon icon;
 	private ImageIcon opponentIcon;
 	private ImageIcon winIcon;
 	private ImageIcon defeatIcon;
-	private Grille[] board = new Grille[9];
+	private Grille[] board = new Grille[16];
 	private Grille currentGrille;
 	private int loc;
 	private static int PORT = 8901;
@@ -70,7 +70,7 @@ public class Client {
 		panel.add(boardPanel); 
 		frame.getContentPane().add(panel); 
 		boardPanel.setBackground(Color.black);
-		boardPanel.setLayout(new GridLayout(3, 3, 2, 2));
+		boardPanel.setLayout(new GridLayout(4, 4, 2, 2));
 		messageLabel.setBounds(0, 398, 520, 64);
 		panel.add(messageLabel);
 		messageLabel.setBackground(Color.BLACK);
@@ -99,33 +99,29 @@ public class Client {
 				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
 				winIcon = new ImageIcon("img/w.png");
 				defeatIcon = new ImageIcon("img/d.png");
-				frame.setTitle("Tic Tac Toe - Player " + mark);
+				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
 			}
 			while (true) {
 				response = in.readLine();
-				System.out.println("message----------> " + response);
 				if (response.startsWith("VALID_MOVE")) {
-					messageLabel.setText("Valid move, please wait");
+					messageLabel.setText("Attendre svp...");
 					currentGrille.setIcon(icon);
 					currentGrille.repaint();
 				} else if (response.startsWith("OPPONENT_MOVED")) {
 					loc = Integer.parseInt(response.substring(15));
 					board[loc].setIcon(opponentIcon);
 					board[loc].repaint();
-					messageLabel.setText("Opponent moved, your turn");
+					messageLabel.setText("Votre adversaire a joué, a toi le tour...");
 				} else if (response.startsWith("VICTORY")) {
 					currentGrille.setIcon(winIcon);
 					currentGrille.repaint();
-					messageLabel.setText("You win");
+					messageLabel.setText("Bravo !! Trésor trouvé !!!...");
 					break;
 				} else if (response.startsWith("DEFEAT")) {
 					board[loc].setIcon(defeatIcon);
 					board[loc].repaint();
-					messageLabel.setText("You lose");
+					messageLabel.setText("Vous avez perdu !!!....");
 					System.out.println();
-					break;
-				} else if (response.startsWith("TIE")) { 
-					messageLabel.setText("You tied");
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
@@ -138,7 +134,7 @@ public class Client {
 	}
 
 	private boolean wantsToPlayAgain() {
-		int response = JOptionPane.showConfirmDialog(frame, "Want to play again?", "Tic Tac Toe is Fun Fun Fun",
+		int response = JOptionPane.showConfirmDialog(frame, "Voulez-vous rejouer ?", "La chasse au trésor c'est le fun !",
 				JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;

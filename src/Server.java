@@ -4,7 +4,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         ServerSocket listener = new ServerSocket(8901);
-        System.out.println("Tic Tac Toe Server is Running");
+        System.out.println(" Chasse au trésor Server is Running...");
         try {
             while (true) {
                 AppGame Game = new AppGame();
