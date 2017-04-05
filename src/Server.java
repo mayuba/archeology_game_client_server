@@ -7,8 +7,10 @@ public class Server {
         System.out.println(" Chasse au trésor Server connecté...");
         try {
             while (true) {
+            	System.out.println(listener.getInetAddress());
                 AppGame Game = new AppGame();
                 Game.runplayer(listener);
+                 
             }
         } finally {
             listener.close();
