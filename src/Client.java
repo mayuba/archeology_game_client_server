@@ -1,16 +1,21 @@
 import javax.swing.JPanel;
+
 import java.awt.GridLayout; 
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage; 
+
 import javax.swing.JLabel;
+
 import java.io.BufferedReader; 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.PrintWriter;
 import java.net.Socket; 
+
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -23,7 +28,7 @@ public class Client {
 	private ImageIcon opponentIcon;
 	private ImageIcon winIcon;
 	private ImageIcon defeatIcon;
-	private Grille[] board = new Grille[16];
+	private Grille[] board = new Grille[49];
 	private Grille currentGrille;
 	private int loc;
 	private static int PORT = 8901;
@@ -51,6 +56,7 @@ public class Client {
 		// Layout GUI
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBounds(59, 11, 389, 355);
+		boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		for (int i = 0; i < board.length; i++) {
 			final int j = i;
 			board[i] = new Grille(); 
@@ -70,7 +76,7 @@ public class Client {
 		panel.add(boardPanel); 
 		frame.getContentPane().add(panel); 
 		boardPanel.setBackground(Color.black);
-		boardPanel.setLayout(new GridLayout(4, 4, 2, 2));
+		boardPanel.setLayout(new GridLayout(7, 7, 2, 2));
 		messageLabel.setBounds(0, 398, 520, 64);
 		panel.add(messageLabel);
 		messageLabel.setBackground(Color.BLACK);
@@ -125,7 +131,9 @@ public class Client {
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
-				}
+				}else if (response.startsWith("DIED")) {
+					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
+					break;}
 			} 
 			out.println("QUIT");
 		} finally {

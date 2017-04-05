@@ -4,7 +4,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         ServerSocket listener = new ServerSocket(8901);
-        System.out.println(" Chasse au trésor Server is Running...");
+        System.out.println(" Chasse au trésor Server connecté...");
         try {
             while (true) {
                 AppGame Game = new AppGame();

@@ -8,7 +8,9 @@ import java.util.Random;
 
 public class AppGame {
 	// a board of 16 squares
-	private Connect[] board = { null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null };
+	private Connect[] board = { null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null,
+	null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null,
+	 null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null, null };
 	 
 	private int tresors;
  
@@ -20,7 +22,7 @@ public class AppGame {
 	}
 	public int generateTresors(){
 		Random rnd = new Random();
-		return rnd.nextInt(15) ;
+		return rnd.nextInt(48) ;
 		
 	}
  
@@ -101,7 +103,8 @@ public class AppGame {
 				output.println("DEBUT " + mark);
 				output.println("MESSAGE Veuillez attendre un adversaire...");
 			} catch (IOException e) {
-				System.out.println("Player died: " + e);
+				output.println("DIED" + mark);
+				System.out.println("Votre adversaire s'est déconnecté: " + e);
 			}
 		}
 
@@ -119,11 +122,11 @@ public class AppGame {
 		public void run() {
 			try {
 				// The thread is only started after everyone connects.
-				output.println("MESSAGE All players connected");
+				output.println("MESSAGE Votre adversaire est connecté. La chasse peut commencer...");
 
 				// Tell the first player that it is his/her turn.
 				if (mark == 'X') {
-					output.println("MESSAGE Your move");
+					output.println("MESSAGE A vous le tour....");
 				}
 
 				// Repeatedly get commands from the client and process them.
@@ -146,7 +149,7 @@ public class AppGame {
 							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
 							
 						} else {
-							output.println("MESSAGE ?");
+							output.println("MESSAGE Veuillez attendre votre tour svp....");
 						}
 						// }
 					} else if (command.startsWith("CHAT")) {
