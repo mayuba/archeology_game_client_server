@@ -4,7 +4,7 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         ServerSocket listener = new ServerSocket(8901);
-        System.out.println(" Chasse au trésor Server connecté...");
+        System.out.println(" Chasse au trésor...Serveur connecté...");
         try {
             while (true) {
             	System.out.println(listener.getInetAddress());
