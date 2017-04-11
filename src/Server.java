@@ -10,7 +10,6 @@ public class Server {
             	System.out.println(listener.getInetAddress());
                 AppGame Game = new AppGame();
                 Game.runplayer(listener);
-                 
             }
         } finally {
             listener.close();

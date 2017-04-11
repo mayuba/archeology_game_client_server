@@ -4,44 +4,48 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Random;
 
 public class AppGame {
 	// a board of 16 squares
-	private Connect[] board = { null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null,
-	null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null,
-	 null, null, null, null, null, null, null, null, null,null, null, null, null, null, null, null, null };
-	 
+	private Connect[] board = { null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+			null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null };
+
 	private int tresors;
- 
+
 	public int getTresors() {
 		return tresors;
 	}
+
 	public void setTresors(int tresors) {
 		this.tresors = tresors;
 	}
-	public int generateTresors(){
+
+	public int generateTresors() {
 		Random rnd = new Random();
-		return rnd.nextInt(48) ;
-		
+		return rnd.nextInt(48);
+
 	}
- 
 
 	// current player
 	Connect currentPlayer;
+
 	public void MESSAGE(String message) {
-		
+
 	}
+
 	public void runplayer(ServerSocket listener) {
 
-		try { 
+		try {
 			Connect player1 = new Connect(listener.accept(), '1');
 			Connect player2 = new Connect(listener.accept(), '2');
 			player1.setOpponent(player2);
 			player2.setOpponent(player1);
 			currentPlayer = player1;
 			setTresors(generateTresors());
-			System.out.println("tttttttttttttttttttttttttttttttttttttt ->"+getTresors());
+			System.out.println("tttttttttttttttttttttttttttttttttttttt ->" + getTresors());
 			player1.start();
 			player2.start();
 		} catch (IOException e) {
@@ -52,7 +56,7 @@ public class AppGame {
 
 	// winner
 	public boolean hasWinner() {
-		return (getBoard()[getTresors()] != null  );
+		return (getBoard()[getTresors()] != null);
 	}
 
 	// no empty squares
@@ -103,8 +107,8 @@ public class AppGame {
 				output.println("DEBUT " + mark);
 				output.println("MESSAGE Vous etes connecté...Veuillez attendre un adversaire svp....");
 			} catch (IOException e) {
-				output.println("DIED" + mark);
-				System.out.println("Votre adversaire s'est déconnecté: " + e);
+				// output.println("DIED" + mark);
+
 			}
 		}
 
@@ -134,35 +138,39 @@ public class AppGame {
 					String command = input.readLine();
 					System.out.println(socket.getChannel());
 					System.out.println(socket.getLocalSocketAddress());
-					System.out.println(socket.getLocalAddress());
+					System.out.println(socket.getInetAddress());
+
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
 						// if (legalMove(location, this)) {
 						if (this == currentPlayer && getBoard()[location] == null) {
 							getBoard()[location] = currentPlayer;
-							System.out.println(currentPlayer+" AVANT");
-							System.out.println(currentPlayer.opponent+" opponent");
+							System.out.println(currentPlayer + " AVANT");
+							System.out.println(currentPlayer.opponent + " opponent");
 							currentPlayer = currentPlayer.opponent;
 							currentPlayer.otherPlayerMoved(location);
-							System.out.println(currentPlayer+" APRES");
+							System.out.println(currentPlayer.getName() + " APRES");
 							output.println("VALID_MOVE");
 							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
-							
+
 						} else {
 							output.println("MESSAGE Veuillez attendre votre tour svp....");
 						}
 						// }
-					} else if (command.startsWith("CHAT")) {
-						System.out.println(currentPlayer+" AVANT");
-						currentPlayer = currentPlayer.opponent;
-						output.println("CHAT" + command);
-						System.out.println(currentPlayer+" APRES");
-						
 					} else if (command.startsWith("QUIT")) {
 						return;
 					}
 				}
+			} catch (SocketException e) {
+				currentPlayer = currentPlayer.opponent;
+				output.println("DIED");
+				System.out.println("---------------------------------");
+				System.out.println("player current = " + currentPlayer);
+				System.out.println("Votre adversaire s'est déconnecté: " + e);
+				System.out.println("Player died: " + e);
+				System.out.println("---------------------------------");
 			} catch (IOException e) {
+				System.out.println("Votre adversaire s'est déconnecté: " + e);
 				System.out.println("Player died: " + e);
 			} finally {
 				try {

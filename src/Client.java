@@ -1,20 +1,21 @@
 import javax.swing.JPanel;
 
-import java.awt.GridLayout; 
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage; 
+import java.awt.image.BufferedImage;
 
 import javax.swing.JLabel;
 
-import java.io.BufferedReader; 
+import java.io.BufferedReader;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.Socket; 
+import java.net.Socket;
+import java.net.SocketException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -44,6 +45,18 @@ public class Client {
 	// Constructs the client by connecting to a server, laying out the GUI and
 	// registering GUI listeners.
 	InetAddress LocalAdress = InetAddress.getLocalHost();
+	String[] message = { "Voulez-vous rejouer ?", "Serveur deconnecter" };
+	String windef;
+	int indexMsg;
+
+	public int getIndexMsg() {
+		return indexMsg;
+	}
+
+	public void setIndexMsg(int indexMsg) {
+		this.indexMsg = indexMsg;
+	}
+
 	/**
 	 * @wbp.parser.entryPoint
 	 */
@@ -60,22 +73,22 @@ public class Client {
 		boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 		for (int i = 0; i < board.length; i++) {
 			final int j = i;
-			board[i] = new Grille(); 
+			board[i] = new Grille();
 			board[i].addMouseListener(new MouseAdapter() {
 				public void mousePressed(MouseEvent e) {
 					currentGrille = board[j];
 					out.println("MOVE " + j);
-					System.out.println(j); 
-				} 
-			}); 
+					System.out.println(j);
+				}
+			});
 			System.out.println(i);
 			boardPanel.add(board[i]);
 		}
 		frame.getContentPane().setLayout(null);
 		panel.setBounds(0, 0, 520, 462);
 		panel.setLayout(null);
-		panel.add(boardPanel); 
-		frame.getContentPane().add(panel); 
+		panel.add(boardPanel);
+		frame.getContentPane().add(panel);
 		boardPanel.setBackground(Color.black);
 		boardPanel.setLayout(new GridLayout(7, 7, 2, 2));
 		messageLabel.setBounds(0, 398, 520, 64);
@@ -97,11 +110,12 @@ public class Client {
 	// message. If an OPPONENT_QUIT message is recevied then the loop will exit
 	// and the server will be sent a "QUIT" message also.
 	public void play() throws Exception {
-		String response; 
+		String response;
+		setIndexMsg(0);
 		try {
 			response = in.readLine();
 			if (response.startsWith("DEBUT")) {
-				char mark = response.charAt(6); 
+				char mark = response.charAt(6);
 				icon = new ImageIcon(mark == '1' ? "img/p1.png" : "img/p2.png");
 				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
 				winIcon = new ImageIcon("img/w.png");
@@ -110,6 +124,7 @@ public class Client {
 			}
 			while (true) {
 				response = in.readLine();
+				System.out.println(response);
 				if (response.startsWith("VALID_MOVE")) {
 					messageLabel.setText("Attendre svp...");
 					currentGrille.setIcon(icon);
@@ -123,27 +138,35 @@ public class Client {
 					currentGrille.setIcon(winIcon);
 					currentGrille.repaint();
 					messageLabel.setText("Bravo !! Trésor trouvé !!!...");
+					windef = "Bravo !! Trésor trouvé !!!...";
 					break;
 				} else if (response.startsWith("DEFEAT")) {
 					board[loc].setIcon(defeatIcon);
 					board[loc].repaint();
 					messageLabel.setText("Vous avez perdu !!!....");
+					windef = "Vous avez perdu !!!....";
 					System.out.println();
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
-				}else if (response.startsWith("DIED")) {
+				} else if (response.startsWith("DIED")) {
 					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
-					break;}
-			} 
+					break;
+				}
+			}
 			out.println("QUIT");
+		} catch (SocketException e) {
+			System.out.println("serveur deconnecter");
+			messageLabel.setText("serveur deconnecter");
+			setIndexMsg(1);
 		} finally {
 			socket.close();
 		}
 	}
 
 	private boolean wantsToPlayAgain() {
-		int response = JOptionPane.showConfirmDialog(frame, "Voulez-vous rejouer ?", "La chasse au trésor c'est le fun !",
+		int pane=JOptionPane.OK_CANCEL_OPTION;
+		int response = JOptionPane.showConfirmDialog(frame, message[getIndexMsg()], windef,
 				JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
@@ -151,10 +174,10 @@ public class Client {
 
 	// main
 	public static void main(String[] args) throws Exception {
-		while (true) { 
-			
+		while (true) {
+
 			String serverAddress = (args.length == 0) ? "localhost" : args[1];
-			
+
 			Client client = new Client(serverAddress);
 			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			client.frame.setSize(548, 504);
