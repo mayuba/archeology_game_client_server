@@ -1,16 +1,11 @@
 import javax.swing.JPanel;
-
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
-
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JLabel;
-
 import java.io.BufferedReader;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,11 +13,9 @@ import java.io.PrintWriter;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -39,7 +32,6 @@ public class Client {
 	private Grille[] board = new Grille[49];
 	private Grille currentGrille;
 	private int loc;
-	// private static int PORT = 8901;
 	private Socket socket;
 	private BufferedReader in;
 	static BufferedImage p1;
@@ -48,17 +40,14 @@ public class Client {
 	BufferedImage d;
 	private PrintWriter out;
 	private final JPanel panel = new JPanel();
-	// Constructs the client by connecting to a server, laying out the GUI and
-	// registering GUI listeners.
 	InetAddress LocalAdress = InetAddress.getLocalHost();
-	String[] message = { "Voulez-vous rejouer ?", "Serveur deconnecter" };
+	String[] message = { "Voulez-vous rejouer ?", "Serveur déconnecté" };
 	String windef;
 	int indexMsg;
 	boolean testServer = true;
-	String effet = "effet de bord";
 	static int compteur = 0;
 	static String nomServeur;
-	static String numPort ;
+	static String numPort;
 	boolean etat = true;
 
 	public int getIndexMsg() {
@@ -69,21 +58,21 @@ public class Client {
 		this.indexMsg = indexMsg;
 	}
 
-	/**
-	 * @wbp.parser.entryPoint
-	 */
 	public Client() throws Exception {
 		System.out.println(etat + " etat <-------------------");
 		while (testServer) {
 			if (compteur < 2)
-				nomServeur = JOptionPane.showInputDialog(null, "Veuillez entré le DNS du serveur", "DNS SERVEUR",
+				nomServeur = JOptionPane.showInputDialog(null,
+						"Veuillez entrer L'adresse IP du Serveur", "IP Serveur",
 						JOptionPane.QUESTION_MESSAGE);
 			if (compteur < 2)
-				numPort = JOptionPane.showInputDialog(null, "Veuillez entré le numero de port ",
-						"PORT DE COMMUNICATION", JOptionPane.QUESTION_MESSAGE);
+				numPort = JOptionPane.showInputDialog(null,
+						"Veuillez entrer le numero de port ",
+						"Port de Communication", JOptionPane.QUESTION_MESSAGE);
 
 			try {
-				String addr = InetAddress.getByName(nomServeur).getHostAddress();
+				String addr = InetAddress.getByName(nomServeur)
+						.getHostAddress();
 				System.out.println(addr);
 				socket = new Socket(addr, Integer.parseInt(numPort));
 				if (socket.isBound()) {
@@ -94,31 +83,35 @@ public class Client {
 				System.out.println(etat + " etat <-------------------");
 			} catch (BindException e) {
 
-				JOptionPane.showMessageDialog(null,
-						"Le port " + numPort + " est deja utiliser \n Choisissez a noouveau", "erreur",
-						JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Le port " + numPort
+						+ " est deja utilisé \n Choisissez a nouveau",
+						"erreur", JOptionPane.INFORMATION_MESSAGE);
 				System.out.println("port deja utiliser");
 			} catch (ConnectException e) {
 				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(null, "Le port choisi est inaccessible \n Choisissez a noouveau");
+				JOptionPane
+						.showMessageDialog(null,
+								"Le port choisi est inaccessible \n Choisissez a nouveau");
 
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(null, "le serveur choisi est inaccessible \n Choisissez a noouveau");
+				JOptionPane
+						.showMessageDialog(null,
+								"le serveur choisi est inaccessible \n Choisissez a noouveau");
 
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(null, "Le réseau choisi est inaccessible \n Choisissez a noouveau");
+				JOptionPane
+						.showMessageDialog(null,
+								"Le réseau choisi est inaccessible \n Choisissez a noouveau");
 
 			}
 
 		}
-		// Setup networking
 
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(socket.getOutputStream(), true);
 
-		// Layout GUI
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBounds(59, 11, 389, 355);
 		boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -148,18 +141,6 @@ public class Client {
 
 	}
 
-	// * The main thread of the client will listen for messages from the server.
-	// The first message will be a "DEBUT" message in which we receive our
-	// mark.
-	// Then we go into a loop listening for:
-	// --> "VALID_MOVE", --> "OPPONENT_MOVED", --> "VICTORY", --> "DEFEAT", -->
-	// "TIE", --> "OPPONENT_QUIT, --> "MESSAGE" messages, and handling each
-	// message appropriately.
-	// The "VICTORY","DEFEAT" and "TIE" ask the user whether or not to play
-	// another game.
-	// If the answer is no, the loop is exited and the server is sent a "QUIT"
-	// message. If an OPPONENT_QUIT message is recevied then the loop will exit
-	// and the server will be sent a "QUIT" message also.
 	public void play() throws Exception {
 		String response;
 		setIndexMsg(0);
@@ -168,7 +149,8 @@ public class Client {
 			if (response.startsWith("DEBUT")) {
 				char mark = response.charAt(6);
 				icon = new ImageIcon(mark == '1' ? "img/p1.png" : "img/p2.png");
-				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
+				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png"
+						: "img/p1.png");
 				winIcon = new ImageIcon("img/w.png");
 				defeatIcon = new ImageIcon("img/d.png");
 				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
@@ -185,7 +167,8 @@ public class Client {
 					loc = Integer.parseInt(response.substring(15));
 					board[loc].setIcon(opponentIcon);
 					board[loc].repaint();
-					messageLabel.setText("Votre adversaire a joué, a toi le tour...");
+					messageLabel
+							.setText("Votre adversaire a joué, a toi le tour...");
 				} else if (response.startsWith("VICTORY")) {
 					currentGrille.setIcon(winIcon);
 					currentGrille.repaint();
@@ -202,7 +185,8 @@ public class Client {
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
 				} else if (response.startsWith("DIED")) {
-					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
+					messageLabel
+							.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
 					break;
 				}
 			}
@@ -218,12 +202,12 @@ public class Client {
 
 	private boolean wantsToPlayAgain() {
 		int pane = JOptionPane.OK_CANCEL_OPTION;
-		int response = JOptionPane.showConfirmDialog(frame, message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
+		int response = JOptionPane.showConfirmDialog(frame,
+				message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
 	}
 
-	// main
 	public static void main(String[] args) throws Exception {
 
 		try {
@@ -236,9 +220,11 @@ public class Client {
 				client.frame.setSize(548, 504);
 				client.frame.setVisible(true);
 				client.frame.setResizable(true);
-				Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+				Dimension dimension = Toolkit.getDefaultToolkit()
+						.getScreenSize();
 				int x = (int) ((dimension.getWidth() - client.frame.getWidth()) / 2);
-				int y = (int) ((dimension.getHeight() - client.frame.getHeight()) / 2);
+				int y = (int) ((dimension.getHeight() - client.frame
+						.getHeight()) / 2);
 				client.frame.setLocation(x, y);
 				client.play();
 				if (!client.wantsToPlayAgain()) {
@@ -247,7 +233,8 @@ public class Client {
 			}
 		} catch (ConnectException e) {
 			// TODO Auto-generated catch block
-			JOptionPane.showMessageDialog(null, "le serveur n'est pas connecté");
+			JOptionPane
+					.showMessageDialog(null, "le serveur n'est pas connecté");
 
 		}
 	}
