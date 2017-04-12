@@ -7,7 +7,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Random;
 
+import javax.swing.JPanel;
+import javax.swing.JButton;
+
 public class AppGame {
+	 
+	JPanel panel = new JPanel();
 	// a board of 16 squares
 	private Connect[] board = { null, null, null, null, null, null, null, null, null, null, null, null, null, null,
 			null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
@@ -15,6 +20,9 @@ public class AppGame {
 
 	private int tresors;
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public int getTresors() {
 		return tresors;
 	}
@@ -139,7 +147,7 @@ public class AppGame {
 					System.out.println(socket.getChannel());
 					System.out.println(socket.getLocalSocketAddress());
 					System.out.println(socket.getInetAddress());
-
+					
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
 						// if (legalMove(location, this)) {
