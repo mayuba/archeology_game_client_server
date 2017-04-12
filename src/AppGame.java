@@ -165,6 +165,8 @@ public class AppGame {
 							output.println("VALID_MOVE");
 							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
 
+						} else if (this == currentPlayer && getBoard()[location] != null) {
+							output.println("MESSAGE La grille est deja utiliser....");
 						} else {
 							output.println("MESSAGE Veuillez attendre votre tour svp....");
 						}
