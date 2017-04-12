@@ -7,6 +7,14 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Random;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import java.awt.Color;
+
 public class AppGame {
 	// a board of 16 squares
 	private Connect[] board = { null, null, null, null, null, null, null, null, null, null, null, null, null, null,
@@ -36,9 +44,13 @@ public class AppGame {
 
 	}
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public void runplayer(ServerSocket listener) {
 
 		try {
+
 			Connect player1 = new Connect(listener.accept(), '1');
 			Connect player2 = new Connect(listener.accept(), '2');
 			player1.setOpponent(player2);
@@ -180,5 +192,4 @@ public class AppGame {
 			}
 		}
 	}
-
 }
