@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
+
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
@@ -52,6 +54,12 @@ public class Client {
 	String[] message = { "Voulez-vous rejouer ?", "Serveur deconnecter" };
 	String windef;
 	int indexMsg;
+	boolean testServer = true;
+	String effet = "effet de bord";
+	static int compteur = 0;
+	static String nomServeur;
+	static String numPort ;
+	boolean etat = true;
 
 	public int getIndexMsg() {
 		return indexMsg;
@@ -65,12 +73,14 @@ public class Client {
 	 * @wbp.parser.entryPoint
 	 */
 	public Client() throws Exception {
-		boolean testServer = true;
+		System.out.println(etat + " etat <-------------------");
 		while (testServer) {
-			String nomServeur = JOptionPane.showInputDialog(null, "Veuillez entré le DNS du serveur","DNS SERVEUR",
-					JOptionPane.QUESTION_MESSAGE);
-			String numPort = JOptionPane.showInputDialog(null, "Veuillez entré le numero de port ","PORT DE COMMUNICATION",
-					JOptionPane.QUESTION_MESSAGE);
+			if (compteur < 2)
+				nomServeur = JOptionPane.showInputDialog(null, "Veuillez entré le DNS du serveur", "DNS SERVEUR",
+						JOptionPane.QUESTION_MESSAGE);
+			if (compteur < 2)
+				numPort = JOptionPane.showInputDialog(null, "Veuillez entré le numero de port ",
+						"PORT DE COMMUNICATION", JOptionPane.QUESTION_MESSAGE);
 
 			try {
 				String addr = InetAddress.getByName(nomServeur).getHostAddress();
@@ -78,7 +88,10 @@ public class Client {
 				socket = new Socket(addr, Integer.parseInt(numPort));
 				if (socket.isBound()) {
 					testServer = false;
-				}
+				} else
+					testServer = true;
+				etat = false;
+				System.out.println(etat + " etat <-------------------");
 			} catch (BindException e) {
 
 				JOptionPane.showMessageDialog(null,
@@ -165,6 +178,7 @@ public class Client {
 				System.out.println(response);
 				if (response.startsWith("VALID_MOVE")) {
 					messageLabel.setText("Attendre svp...");
+
 					currentGrille.setIcon(icon);
 					currentGrille.repaint();
 				} else if (response.startsWith("OPPONENT_MOVED")) {
@@ -213,8 +227,10 @@ public class Client {
 	public static void main(String[] args) throws Exception {
 
 		try {
+
 			while (true) {
- 
+				compteur++;
+				System.out.println(compteur + "  <------------------------");
 				Client client = new Client();
 				client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				client.frame.setSize(548, 504);
