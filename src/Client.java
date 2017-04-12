@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -117,7 +118,8 @@ public class Client {
 			if (response.startsWith("DEBUT")) {
 				char mark = response.charAt(6);
 				icon = new ImageIcon(mark == '1' ? "img/p1.png" : "img/p2.png");
-				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
+				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png"
+						: "img/p1.png");
 				winIcon = new ImageIcon("img/w.png");
 				defeatIcon = new ImageIcon("img/d.png");
 				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
@@ -133,7 +135,8 @@ public class Client {
 					loc = Integer.parseInt(response.substring(15));
 					board[loc].setIcon(opponentIcon);
 					board[loc].repaint();
-					messageLabel.setText("Votre adversaire a joué, a toi le tour...");
+					messageLabel
+							.setText("Votre adversaire a joué, a toi le tour...");
 				} else if (response.startsWith("VICTORY")) {
 					currentGrille.setIcon(winIcon);
 					currentGrille.repaint();
@@ -150,7 +153,8 @@ public class Client {
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
 				} else if (response.startsWith("DIED")) {
-					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
+					messageLabel
+							.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
 					break;
 				}
 			}
@@ -165,32 +169,41 @@ public class Client {
 	}
 
 	private boolean wantsToPlayAgain() {
-		int pane=JOptionPane.OK_CANCEL_OPTION;
-		int response = JOptionPane.showConfirmDialog(frame, message[getIndexMsg()], windef,
-				JOptionPane.YES_NO_OPTION);
+		int pane = JOptionPane.OK_CANCEL_OPTION;
+		int response = JOptionPane.showConfirmDialog(frame,
+				message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
 	}
 
 	// main
 	public static void main(String[] args) throws Exception {
-		while (true) {
+		try {
+			while (true) {
 
-			String serverAddress = (args.length == 0) ? "localhost" : args[1];
+				String serverAddress = (args.length == 0) ? "localhost"
+						: args[1];
 
-			Client client = new Client(serverAddress);
-			client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			client.frame.setSize(548, 504);
-			client.frame.setVisible(true);
-			client.frame.setResizable(true);
-			Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-			int x = (int) ((dimension.getWidth() - client.frame.getWidth()) / 2);
-			int y = (int) ((dimension.getHeight() - client.frame.getHeight()) / 2);
-			client.frame.setLocation(x, y);
-			client.play();
-			if (!client.wantsToPlayAgain()) {
-				break;
+				Client client = new Client(serverAddress);
+				client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				client.frame.setSize(548, 504);
+				client.frame.setVisible(true);
+				client.frame.setResizable(true);
+				Dimension dimension = Toolkit.getDefaultToolkit()
+						.getScreenSize();
+				int x = (int) ((dimension.getWidth() - client.frame.getWidth()) / 2);
+				int y = (int) ((dimension.getHeight() - client.frame
+						.getHeight()) / 2);
+				client.frame.setLocation(x, y);
+				client.play();
+				if (!client.wantsToPlayAgain()) {
+					break;
+				}
 			}
+		} catch (ConnectException e) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "le serveur n'est pas connecté");
+			
 		}
 	}
 }
