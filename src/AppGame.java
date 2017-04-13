@@ -7,14 +7,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Random;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import java.awt.Color;
-
 public class AppGame {
 	// Grille de 49 cases
 	private Connect[] board = { null, null, null, null, null, null, null, null, null, null, null, null, null, null,
@@ -38,7 +30,7 @@ public class AppGame {
 	}
 
 	// current player
-	Connect currentPlayer;
+	Connect JoueurCourant;
 
 	public void MESSAGE(String message) {
 
@@ -53,9 +45,9 @@ public class AppGame {
 
 			Connect player1 = new Connect(listener.accept(), '1');
 			Connect player2 = new Connect(listener.accept(), '2');
-			player1.setOpponent(player2);
-			player2.setOpponent(player1);
-			currentPlayer = player1;
+			player1.setAdvers(player2);
+			player2.setAdvers(player1);
+			JoueurCourant = player1;
 			setTresors(generateTresors());
 			System.out.println("------------------------->" + getTresors());
 			player1.start();
@@ -66,27 +58,17 @@ public class AppGame {
 		}
 	}
 
-	public boolean hasWinner() {
+	public boolean winner() {
 		return (getBoard()[getTresors()] != null);
 	}
 
-	public boolean boardFilledUp() {
+	public boolean initGrille() {
 		for (int i = 0; i < getBoard().length; i++) {
 			if (getBoard()[i] == null) {
 				return false;
 			}
 		}
 		return true;
-	}
-
-	public synchronized boolean legalMove(int location, Connect player) {
-		if (player == currentPlayer && getBoard()[location] == null) {
-			getBoard()[location] = currentPlayer;
-			currentPlayer = currentPlayer.opponent;
-			currentPlayer.otherPlayerMoved(location);
-			return true;
-		}
-		return false;
 	}
 
 	public Connect[] getBoard() {
@@ -118,13 +100,13 @@ public class AppGame {
 			}
 		}
 
-		public void setOpponent(Connect opponent) {
+		public void setAdvers(Connect opponent) {
 			this.opponent = opponent;
 		}
 
-		public void otherPlayerMoved(int location) {
+		public void adversMoved(int location) {
 			output.println("OPPONENT_MOVED " + location);
-			output.println(hasWinner() ? "DEFEAT" : boardFilledUp() ? "TIE" : "");
+			output.println(winner() ? "DEFEAT" : initGrille() ? "TIE" : "");
 		}
 
 		public void run() {
@@ -132,7 +114,7 @@ public class AppGame {
 
 				output.println("MESSAGE Votre adversaire est connecté. La chasse peut commencer...");
 
-				if (mark == 'X') {
+				if (mark == '1') {
 					output.println("MESSAGE A vous le tour....");
 				}
 
@@ -145,38 +127,57 @@ public class AppGame {
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
 
-						if (this == currentPlayer && getBoard()[location] == null) {
-							getBoard()[location] = currentPlayer;
-							System.out.println(currentPlayer + " AVANT");
-							System.out.println(currentPlayer.opponent + " opponent");
-							currentPlayer = currentPlayer.opponent;
-							currentPlayer.otherPlayerMoved(location);
-							System.out.println(currentPlayer.getName() + " APRES");
+						if (this == JoueurCourant && getBoard()[location] == null) {
+							getBoard()[location] = JoueurCourant;
+							System.out.println(JoueurCourant + " AVANT");
+							System.out.println(JoueurCourant.opponent + " opponent");
+							JoueurCourant = JoueurCourant.opponent;
+							JoueurCourant.adversMoved(location);
+							System.out.println(JoueurCourant.getName() + " APRES");
 							output.println("VALID_MOVE");
-							output.println(hasWinner() ? "VICTORY" : boardFilledUp() ? "TIE" : "");
+							output.println(winner() ? "VICTORY" : initGrille() ? "TIE" : "");
 
-						} else if (this == currentPlayer && getBoard()[location] != null) {
+						} else if (this == JoueurCourant && getBoard()[location] != null) {
 							output.println("MESSAGE La grille est deja utiliser....");
+						} else if (JoueurCourant == null) {
+							System.out.println("probleme");
+							output.println("DIED");
 						} else {
 							output.println("MESSAGE Veuillez attendre votre tour svp....");
 						}
 
+					} else if (command.startsWith("test") && JoueurCourant == null) {
+						output.println("DIED");
 					} else if (command.startsWith("QUIT")) {
 						return;
 					}
 				}
-			} catch (SocketException e) {
-				currentPlayer = currentPlayer.opponent;
+			} catch (
+
+			SocketException e)
+
+			{
+				JoueurCourant.interrupt();
+				System.out.println("j1 " + JoueurCourant);
+				JoueurCourant = null;
+				System.out.println("j2 " + JoueurCourant.isAlive());
 				output.println("DIED");
 				System.out.println("---------------------------------");
-				System.out.println("player current = " + currentPlayer);
+				System.out.println("player current = " + JoueurCourant);
 				System.out.println("Votre adversaire s'est déconnecté: " + e);
 				System.out.println("Player died: " + e);
 				System.out.println("---------------------------------");
-			} catch (IOException e) {
+
+			} catch (
+
+			IOException e)
+
+			{
 				System.out.println("Votre adversaire s'est déconnecté: " + e);
 				System.out.println("Player died: " + e);
-			} finally {
+			} finally
+
+			{
 				try {
 					socket.close();
 				} catch (IOException e) {

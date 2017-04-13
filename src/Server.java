@@ -1,7 +1,5 @@
 import java.net.InetAddress;
 import java.net.ServerSocket;
-
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class Server {
@@ -13,11 +11,10 @@ public class Server {
 
 		try {
 			while (true) {
-				InetAddress addr=InetAddress.getLocalHost();
+				InetAddress addr = InetAddress.getLocalHost();
 				System.out.println(addr.getHostName());
-				 System.out.println(addr.getHostAddress());
+				System.out.println(addr.getHostAddress());
 				AppGame Game = new AppGame();
-
 				Game.runplayer(listener);
 
 			}

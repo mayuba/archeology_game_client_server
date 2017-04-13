@@ -1,5 +1,4 @@
 import javax.swing.JPanel;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
@@ -16,24 +15,18 @@ import java.io.PrintWriter;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
+import javax.swing.BorderFactory; 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.awt.event.MouseMotionAdapter;
 
 public class Client {
 
 	private JFrame frame = new JFrame("Chasse au trésor");
 	private JLabel messageLabel = new JLabel("");
-	private ImageIcon icon;
-	private ImageIcon opponentIcon;
-	private ImageIcon winIcon;
-	private ImageIcon defeatIcon;
 	private Grille[] board = new Grille[49];
 	private Grille currentGrille;
 	private int loc;
@@ -64,7 +57,16 @@ public class Client {
 		this.indexMsg = indexMsg;
 	}
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public Client() throws Exception {
+		frame.getContentPane().addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				out.println("test");
+			}
+		});
 		System.out.println(etat + " etat <-------------------");
 		while (testServer) {
 			if (compteur < 2)
@@ -121,9 +123,11 @@ public class Client {
 					System.out.println(j);
 				}
 			});
+			
 			System.out.println(i);
 			boardPanel.add(board[i]);
 		}
+		 
 		frame.getContentPane().setLayout(null);
 		panel.setBounds(0, 0, 520, 462);
 		panel.setLayout(null);
@@ -137,17 +141,13 @@ public class Client {
 
 	}
 
-	public void play() throws Exception {
+	public void playGame() throws Exception {
 		String response;
 		setIndexMsg(0);
 		try {
 			response = in.readLine();
 			if (response.startsWith("DEBUT")) {
 				char mark = response.charAt(6);
-				icon = new ImageIcon(mark == '1' ? "img/p1.png" : "img/p2.png");
-				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
-				winIcon = new ImageIcon("img/w.png");
-				defeatIcon = new ImageIcon("img/d.png");
 				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
 			}
 			while (true) {
@@ -180,6 +180,7 @@ public class Client {
 					messageLabel.setText(response.substring(8));
 				} else if (response.startsWith("DIED")) {
 					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
+					windef="Oups !!! Votre adversaire vient de se déconnecter !!!....";
 					break;
 				}
 			}
@@ -193,9 +194,8 @@ public class Client {
 		}
 	}
 
-	private boolean wantsToPlayAgain() {
-		int pane = JOptionPane.OK_CANCEL_OPTION;
-		int response = JOptionPane.showConfirmDialog(frame, message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
+	private boolean wantsToAgain() { 
+		int response = JOptionPane.showConfirmDialog(frame, windef+" \n "+message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
 	}
@@ -216,8 +216,8 @@ public class Client {
 				int x = (int) ((dimension.getWidth() - client.frame.getWidth()) / 2);
 				int y = (int) ((dimension.getHeight() - client.frame.getHeight()) / 2);
 				client.frame.setLocation(x, y);
-				client.play();
-				if (!client.wantsToPlayAgain()) {
+				client.playGame();
+				if (!client.wantsToAgain()) {
 					break;
 				}
 			}
