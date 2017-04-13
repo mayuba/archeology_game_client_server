@@ -66,8 +66,7 @@ public class Client {
 			public void mouseMoved(MouseEvent e) {
 				out.println("test");
 			}
-		});
-		System.out.println(etat + " etat <-------------------");
+		}); 
 		while (testServer) {
 			if (compteur < 2)
 				nomServeur = JOptionPane.showInputDialog(null, "Veuillez entrer l'adresse IP du Serveur",
@@ -77,21 +76,18 @@ public class Client {
 						"PORT DE COMMUNICATION", JOptionPane.QUESTION_MESSAGE);
 
 			try {
-				String addr = InetAddress.getByName(nomServeur).getHostAddress();
-				System.out.println(addr);
+				String addr = InetAddress.getByName(nomServeur).getHostAddress(); 
 				socket = new Socket(addr, Integer.parseInt(numPort));
 				if (socket.isBound()) {
 					testServer = false;
 				} else
 					testServer = true;
-				etat = false;
-				System.out.println(etat + " etat <-------------------");
+				etat = false; 
 			} catch (BindException e) {
 
 				JOptionPane.showMessageDialog(null,
 						"Le port " + numPort + " est deja utiliser \n Choisissez a noouveau", "erreur",
-						JOptionPane.INFORMATION_MESSAGE);
-				System.out.println("port deja utiliser");
+						JOptionPane.INFORMATION_MESSAGE); 
 			} catch (ConnectException e) {
 				// TODO Auto-generated catch block
 				JOptionPane.showMessageDialog(null, "Le port choisi est inaccessible \n Choisissez a noouveau");
@@ -119,12 +115,10 @@ public class Client {
 			board[i].addMouseListener(new MouseAdapter() {
 				public void mousePressed(MouseEvent e) {
 					currentGrille = board[j];
-					out.println("MOVE " + j);
-					System.out.println(j);
+					out.println("MOVE " + j); 
 				}
 			});
-			
-			System.out.println(i);
+			 
 			boardPanel.add(board[i]);
 		}
 		 
@@ -151,8 +145,7 @@ public class Client {
 				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
 			}
 			while (true) {
-				response = in.readLine();
-				System.out.println(response);
+				response = in.readLine(); 
 				if (response.startsWith("VALID_MOVE")) {
 					messageLabel.setText("Attendre svp...");
 
@@ -173,8 +166,7 @@ public class Client {
 					board[loc].setColor(Color.YELLOW);
 					board[loc].repaint();
 					messageLabel.setText("Vous avez perdu !!!....");
-					windef = "Vous avez perdu !!!....";
-					System.out.println();
+					windef = "Vous avez perdu !!!...."; 
 					break;
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
@@ -185,8 +177,7 @@ public class Client {
 				}
 			}
 			out.println("QUIT");
-		} catch (SocketException e) {
-			System.out.println("Serveur déconnecté");
+		} catch (SocketException e) { 
 			messageLabel.setText("Serveur déconnecté");
 			setIndexMsg(1);
 		} finally {
@@ -205,8 +196,7 @@ public class Client {
 		try {
 
 			while (true) {
-				compteur++;
-				System.out.println(compteur + "  <------------------------");
+				compteur++; 
 				Client client = new Client();
 				client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				client.frame.setSize(548, 504);

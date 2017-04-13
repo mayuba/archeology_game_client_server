@@ -119,28 +119,21 @@ public class AppGame {
 				}
 
 				while (true) {
-					String command = input.readLine();
-					System.out.println(socket.getChannel());
-					System.out.println(socket.getLocalSocketAddress());
-					System.out.println(socket.getInetAddress());
+					String command = input.readLine(); 
 
 					if (command.startsWith("MOVE")) {
 						int location = Integer.parseInt(command.substring(5));
 
 						if (this == JoueurCourant && getBoard()[location] == null) {
 							getBoard()[location] = JoueurCourant;
-							System.out.println(JoueurCourant + " AVANT");
-							System.out.println(JoueurCourant.opponent + " opponent");
 							JoueurCourant = JoueurCourant.opponent;
 							JoueurCourant.adversMoved(location);
-							System.out.println(JoueurCourant.getName() + " APRES");
 							output.println("VALID_MOVE");
 							output.println(winner() ? "VICTORY" : initGrille() ? "TIE" : "");
 
 						} else if (this == JoueurCourant && getBoard()[location] != null) {
 							output.println("MESSAGE La grille est deja utiliser....");
 						} else if (JoueurCourant == null) {
-							System.out.println("probleme");
 							output.println("DIED");
 						} else {
 							output.println("MESSAGE Veuillez attendre votre tour svp....");
@@ -158,9 +151,7 @@ public class AppGame {
 
 			{
 				JoueurCourant.interrupt();
-				System.out.println("j1 " + JoueurCourant);
 				JoueurCourant = null;
-				System.out.println("j2 " + JoueurCourant.isAlive());
 				output.println("DIED");
 				System.out.println("---------------------------------");
 				System.out.println("player current = " + JoueurCourant);
@@ -168,13 +159,8 @@ public class AppGame {
 				System.out.println("Player died: " + e);
 				System.out.println("---------------------------------");
 
-			} catch (
-
-			IOException e)
-
-			{
-				System.out.println("Votre adversaire s'est déconnecté: " + e);
-				System.out.println("Player died: " + e);
+			} catch (IOException e) {
+				System.out.println("Erreur fatal " + e); 
 			} finally
 
 			{
