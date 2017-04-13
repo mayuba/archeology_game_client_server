@@ -1,11 +1,14 @@
 import javax.swing.JPanel;
+import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.io.InputStreamReader;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JLabel;
+
 import java.io.BufferedReader;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,9 +16,11 @@ import java.io.PrintWriter;
 import java.net.BindException;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -45,6 +50,7 @@ public class Client {
 	String windef;
 	int indexMsg;
 	boolean testServer = true;
+	String effet = "effet de bord";
 	static int compteur = 0;
 	static String nomServeur;
 	static String numPort;
@@ -62,17 +68,14 @@ public class Client {
 		System.out.println(etat + " etat <-------------------");
 		while (testServer) {
 			if (compteur < 2)
-				nomServeur = JOptionPane.showInputDialog(null,
-						"Veuillez entrer L'adresse IP du Serveur", "IP Serveur",
-						JOptionPane.QUESTION_MESSAGE);
+				nomServeur = JOptionPane.showInputDialog(null, "Veuillez entrer l'adresse IP du Serveur",
+						"IP du Serveur", JOptionPane.QUESTION_MESSAGE);
 			if (compteur < 2)
-				numPort = JOptionPane.showInputDialog(null,
-						"Veuillez entrer le numero de port ",
-						"Port de Communication", JOptionPane.QUESTION_MESSAGE);
+				numPort = JOptionPane.showInputDialog(null, "Veuillez entrer le numero de port ",
+						"PORT DE COMMUNICATION", JOptionPane.QUESTION_MESSAGE);
 
 			try {
-				String addr = InetAddress.getByName(nomServeur)
-						.getHostAddress();
+				String addr = InetAddress.getByName(nomServeur).getHostAddress();
 				System.out.println(addr);
 				socket = new Socket(addr, Integer.parseInt(numPort));
 				if (socket.isBound()) {
@@ -83,27 +86,21 @@ public class Client {
 				System.out.println(etat + " etat <-------------------");
 			} catch (BindException e) {
 
-				JOptionPane.showMessageDialog(null, "Le port " + numPort
-						+ " est deja utilisé \n Choisissez a nouveau",
-						"erreur", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(null,
+						"Le port " + numPort + " est deja utiliser \n Choisissez a noouveau", "erreur",
+						JOptionPane.INFORMATION_MESSAGE);
 				System.out.println("port deja utiliser");
 			} catch (ConnectException e) {
 				// TODO Auto-generated catch block
-				JOptionPane
-						.showMessageDialog(null,
-								"Le port choisi est inaccessible \n Choisissez a nouveau");
+				JOptionPane.showMessageDialog(null, "Le port choisi est inaccessible \n Choisissez a noouveau");
 
 			} catch (UnknownHostException e) {
 				// TODO Auto-generated catch block
-				JOptionPane
-						.showMessageDialog(null,
-								"le serveur choisi est inaccessible \n Choisissez a noouveau");
+				JOptionPane.showMessageDialog(null, "le Serveur spécifié est inaccessible \n Choisissez a noouveau");
 
 			} catch (SocketException e) {
 				// TODO Auto-generated catch block
-				JOptionPane
-						.showMessageDialog(null,
-								"Le réseau choisi est inaccessible \n Choisissez a noouveau");
+				JOptionPane.showMessageDialog(null, "Le réseau choisi est inaccessible \n Choisissez a noouveau");
 
 			}
 
@@ -111,7 +108,6 @@ public class Client {
 
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		out = new PrintWriter(socket.getOutputStream(), true);
-
 		JPanel boardPanel = new JPanel();
 		boardPanel.setBounds(59, 11, 389, 355);
 		boardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -149,8 +145,7 @@ public class Client {
 			if (response.startsWith("DEBUT")) {
 				char mark = response.charAt(6);
 				icon = new ImageIcon(mark == '1' ? "img/p1.png" : "img/p2.png");
-				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png"
-						: "img/p1.png");
+				opponentIcon = new ImageIcon(mark == '1' ? "img/p2.png" : "img/p1.png");
 				winIcon = new ImageIcon("img/w.png");
 				defeatIcon = new ImageIcon("img/d.png");
 				frame.setTitle("Chasse au trésor - Joueur Num " + mark);
@@ -161,22 +156,21 @@ public class Client {
 				if (response.startsWith("VALID_MOVE")) {
 					messageLabel.setText("Attendre svp...");
 
-					currentGrille.setIcon(icon);
+					currentGrille.setColor(Color.GREEN);
 					currentGrille.repaint();
 				} else if (response.startsWith("OPPONENT_MOVED")) {
 					loc = Integer.parseInt(response.substring(15));
-					board[loc].setIcon(opponentIcon);
+					board[loc].setColor(Color.RED);
 					board[loc].repaint();
-					messageLabel
-							.setText("Votre adversaire a joué, a toi le tour...");
+					messageLabel.setText("Votre adversaire a joué, a vous le tour...");
 				} else if (response.startsWith("VICTORY")) {
-					currentGrille.setIcon(winIcon);
+					currentGrille.setColor(Color.YELLOW);
 					currentGrille.repaint();
 					messageLabel.setText("Bravo !! Trésor trouvé !!!...");
 					windef = "Bravo !! Trésor trouvé !!!...";
 					break;
 				} else if (response.startsWith("DEFEAT")) {
-					board[loc].setIcon(defeatIcon);
+					board[loc].setColor(Color.YELLOW);
 					board[loc].repaint();
 					messageLabel.setText("Vous avez perdu !!!....");
 					windef = "Vous avez perdu !!!....";
@@ -185,15 +179,14 @@ public class Client {
 				} else if (response.startsWith("MESSAGE")) {
 					messageLabel.setText(response.substring(8));
 				} else if (response.startsWith("DIED")) {
-					messageLabel
-							.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
+					messageLabel.setText("Oups !!! Votre adversaire vient de se déconnecter !!!....");
 					break;
 				}
 			}
 			out.println("QUIT");
 		} catch (SocketException e) {
-			System.out.println("serveur deconnecter");
-			messageLabel.setText("serveur deconnecter");
+			System.out.println("Serveur déconnecté");
+			messageLabel.setText("Serveur déconnecté");
 			setIndexMsg(1);
 		} finally {
 			socket.close();
@@ -202,8 +195,7 @@ public class Client {
 
 	private boolean wantsToPlayAgain() {
 		int pane = JOptionPane.OK_CANCEL_OPTION;
-		int response = JOptionPane.showConfirmDialog(frame,
-				message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
+		int response = JOptionPane.showConfirmDialog(frame, message[getIndexMsg()], windef, JOptionPane.YES_NO_OPTION);
 		frame.dispose();
 		return response == JOptionPane.YES_OPTION;
 	}
@@ -220,11 +212,9 @@ public class Client {
 				client.frame.setSize(548, 504);
 				client.frame.setVisible(true);
 				client.frame.setResizable(true);
-				Dimension dimension = Toolkit.getDefaultToolkit()
-						.getScreenSize();
+				Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 				int x = (int) ((dimension.getWidth() - client.frame.getWidth()) / 2);
-				int y = (int) ((dimension.getHeight() - client.frame
-						.getHeight()) / 2);
+				int y = (int) ((dimension.getHeight() - client.frame.getHeight()) / 2);
 				client.frame.setLocation(x, y);
 				client.play();
 				if (!client.wantsToPlayAgain()) {
@@ -233,8 +223,7 @@ public class Client {
 			}
 		} catch (ConnectException e) {
 			// TODO Auto-generated catch block
-			JOptionPane
-					.showMessageDialog(null, "le serveur n'est pas connecté");
+			JOptionPane.showMessageDialog(null, "Le Serveur n'est pas connecté");
 
 		}
 	}
